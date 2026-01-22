@@ -22,46 +22,46 @@ Implementasi AI Isometric Icon Generator menggunakan Next.js 16 dengan App Route
     - Definisikan core types: `StylePreset`, `GenerationError`, `HistoryItem`, `GeneratorState`
     - _Requirements: 3.1_
 
-- [ ] 2. Implementasi Core Utilities
-  - [ ] 2.1 Implementasi input sanitizer dan validator
+- [x] 2. Implementasi Core Utilities
+  - [x] 2.1 Implementasi input sanitizer dan validator
     - Buat fungsi `sanitizeInput()` untuk XSS prevention
     - Buat fungsi `isValidPrompt()` untuk validasi empty/whitespace
     - Buat fungsi `enforceCharacterLimit()` untuk limit 200 karakter
     - _Requirements: 2.2, 2.4, 2.5_
-  - [ ] 2.2 Write property test untuk character limit
+  - [x] 2.2 Write property test untuk character limit
     - **Property 1: Character Limit Enforcement**
     - **Validates: Requirements 2.2, 2.3**
-  - [ ] 2.3 Write property test untuk empty input rejection
+  - [x] 2.3 Write property test untuk empty input rejection
     - **Property 2: Empty Input Rejection**
     - **Validates: Requirements 2.4**
-  - [ ] 2.4 Write property test untuk XSS sanitization
+  - [x] 2.4 Write property test untuk XSS sanitization
     - **Property 3: XSS Input Sanitization**
     - **Validates: Requirements 2.5**
-  - [ ] 2.5 Implementasi Rate Limiter
+  - [x] 2.5 Implementasi Rate Limiter
     - Buat `createRateLimiter()` dengan localStorage persistence
     - Implementasi `canMakeRequest()`, `recordRequest()`, `getTimeUntilReset()`
     - Limit: 10 requests per 60 seconds
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
-  - [ ] 2.6 Write property test untuk rate limiter
+  - [x] 2.6 Write property test untuk rate limiter
     - **Property 9: Rate Limit Enforcement**
     - **Validates: Requirements 8.1, 8.2**
-  - [ ] 2.7 Implementasi filename generator
+  - [x] 2.7 Implementasi filename generator
     - Buat fungsi `generateFilename()` dari prompt
     - Lowercase, replace spaces with hyphens, remove special chars, append .png
     - _Requirements: 6.3_
-  - [ ] 2.8 Write property test untuk filename generation
+  - [x] 2.8 Write property test untuk filename generation
     - **Property 7: Filename Generation from Prompt**
     - **Validates: Requirements 6.3**
 
-- [ ] 3. Checkpoint - Core Utilities
+- [x] 3. Checkpoint - Core Utilities
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Implementasi History Manager
-  - [ ] 4.1 Implementasi History Manager dengan localStorage
+- [x] 4. Implementasi History Manager
+  - [x] 4.1 Implementasi History Manager dengan localStorage
     - Buat `useHistory` hook dengan `getAll()`, `add()`, `remove()`, `clear()`
     - Implementasi localStorage persistence dengan versioning
     - _Requirements: 9.1, 9.2, 9.5, 9.6_
-  - [ ] 4.2 Write property test untuk history persistence
+  - [x] 4.2 Write property test untuk history persistence
     - **Property 10: History Persistence Round-Trip**
     - **Validates: Requirements 9.1, 9.6**
 
