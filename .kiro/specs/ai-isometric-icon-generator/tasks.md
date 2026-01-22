@@ -76,24 +76,24 @@ Implementasi AI Isometric Icon Generator menggunakan Next.js 16 dengan App Route
     - **Property 6: Isometric Transformation Matrix**
     - **Validates: Requirements 5.1**
 
-- [ ] 6. Implementasi API Route
-  - [ ] 6.1 Buat API route `/api/generate`
+- [x] 6. Implementasi API Route
+  - [x] 6.1 Buat API route `/api/generate`
     - Implementasi POST handler dengan request validation
     - Integrasi dengan Hugging Face Inference API
     - Implementasi error handling untuk 429, 503, 401, 500
     - Tambahkan timeout 10 seconds untuk API call
     - _Requirements: 4.1, 4.5, 4.6, 7.1, 7.2, 7.3, 7.4, 13.3, 13.4_
-  - [ ] 6.2 Write property test untuk API input sanitization
+  - [x] 6.2 Write property test untuk API input sanitization
     - **Property 11: API Input Sanitization**
     - **Validates: Requirements 13.4**
-  - [ ] 6.3 Implementasi style preset to prompt mapping
+  - [x] 6.3 Implementasi style preset to prompt mapping
     - Buat fungsi `buildPrompt()` yang menggabungkan user prompt dengan style suffix
     - _Requirements: 3.4_
-  - [ ] 6.4 Write property test untuk style mapping
+  - [x] 6.4 Write property test untuk style mapping
     - **Property 4: Style Preset to Prompt Mapping**
     - **Validates: Requirements 3.4**
 
-- [ ] 7. Checkpoint - Backend Services
+- [x] 7. Checkpoint - Backend Services
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 8. Implementasi UI Components
