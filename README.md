@@ -1,0 +1,111 @@
+# AI Isometric Icon Generator
+
+Create stunning isometric 3D icons from text prompts using AI. Perfect for designers, developers, and content creators who need quick, consistent isometric graphics without manual design work.
+
+## Features
+
+- **Text-to-Icon Generation**: Describe your icon and let AI create it
+- **Style Presets**: Choose from Default (blue), Warm (orange/red), Monochrome (grayscale), or Pastel themes
+- **Isometric Post-Processing**: Automatic 30° rotation with depth gradients and shadows
+- **Generation History**: Save and redownload your past creations
+- **Responsive Design**: Works on mobile, tablet, and desktop
+- **Accessible**: WCAG compliant with keyboard navigation and screen reader support
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript (strict mode)
+- **Styling**: Tailwind CSS v4
+- **Animation**: Framer Motion
+- **Icons**: Lucide React
+- **AI**: Hugging Face Inference API
+- **Testing**: Vitest + fast-check (property-based testing)
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- Hugging Face API key ([Get one here](https://huggingface.co/settings/tokens))
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/your-username/ai-isometric-icon-generator.git
+   cd ai-isometric-icon-generator
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+4. Add your Hugging Face API key to `.env.local`:
+
+   ```
+   HUGGINGFACE_API_KEY=your_api_key_here
+   ```
+
+5. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Scripts
+
+| Command              | Description              |
+| -------------------- | ------------------------ |
+| `npm run dev`        | Start development server |
+| `npm run build`      | Build for production     |
+| `npm run start`      | Start production server  |
+| `npm run lint`       | Run ESLint               |
+| `npm run test`       | Run tests once           |
+| `npm run test:watch` | Run tests in watch mode  |
+
+## Project Structure
+
+```
+├── app/                  # Next.js App Router pages
+│   ├── api/             # API routes
+│   ├── generate/        # Generator page
+│   └── page.tsx         # Landing page
+├── components/          # React components
+├── hooks/               # Custom React hooks
+├── lib/                 # Utility functions
+├── types/               # TypeScript type definitions
+└── __tests__/           # Test files
+    ├── unit/           # Unit tests
+    ├── properties/     # Property-based tests
+    └── integration/    # Integration tests
+```
+
+## Design System
+
+| Token      | Value                                                     |
+| ---------- | --------------------------------------------------------- |
+| Base Color | `#0f172a`                                                 |
+| Primary    | `#6366f1` (Indigo)                                        |
+| Secondary  | `#8b5cf6` (Violet)                                        |
+| Font       | Inter                                                     |
+| Spacing    | xs(4px), sm(8px), md(16px), lg(24px), xl(32px), 2xl(48px) |
+
+## Rate Limiting
+
+To protect API quota, the app limits requests to 10 per minute per client.
+
+## License
+
+MIT
