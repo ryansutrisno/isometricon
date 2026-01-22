@@ -65,14 +65,14 @@ Implementasi AI Isometric Icon Generator menggunakan Next.js 16 dengan App Route
     - **Property 10: History Persistence Round-Trip**
     - **Validates: Requirements 9.1, 9.6**
 
-- [ ] 5. Implementasi Isometric Transformer
-  - [ ] 5.1 Implementasi canvas-based isometric transformation
+- [x] 5. Implementasi Isometric Transformer
+  - [x] 5.1 Implementasi canvas-based isometric transformation
     - Buat fungsi `transformToIsometric()` dengan canvas API
     - Implementasi 30° rotation matrix
     - Tambahkan depth gradient overlay
     - Tambahkan shadow effects
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
-  - [ ] 5.2 Write property test untuk isometric transformation
+  - [x] 5.2 Write property test untuk isometric transformation
     - **Property 6: Isometric Transformation Matrix**
     - **Validates: Requirements 5.1**
 
