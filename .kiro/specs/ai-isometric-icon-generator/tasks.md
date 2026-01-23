@@ -135,21 +135,21 @@ Implementasi AI Isometric Icon Generator menggunakan Next.js 16 dengan App Route
     - Clear history button
     - _Requirements: 9.2, 9.3, 9.4, 9.5_
 
-- [ ] 9. Implementasi Custom Hooks
-  - [ ] 9.1 Implementasi useGenerator hook
+- [x] 9. Implementasi Custom Hooks
+  - [x] 9.1 Implementasi useGenerator hook
     - State management untuk generator
     - `generate()`, `regenerate()`, `download()`, `reset()` functions
     - Integration dengan rate limiter dan history
     - _Requirements: 4.1, 4.7_
-  - [ ] 9.2 Write property test untuk regenerate state preservation
+  - [x] 9.2 Write property test untuk regenerate state preservation
     - **Property 5: Regenerate State Preservation**
     - **Validates: Requirements 4.7**
-  - [ ] 9.3 Implementasi useRateLimit hook
+  - [x] 9.3 Implementasi useRateLimit hook
     - Wrapper untuk rate limiter dengan React state
     - Auto-update countdown timer
     - _Requirements: 8.1, 8.2, 8.3_
 
-- [ ] 10. Checkpoint - UI Components
+- [x] 10. Checkpoint - UI Components
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 11. Implementasi Pages
