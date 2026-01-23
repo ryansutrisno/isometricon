@@ -101,7 +101,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
                 />
             </head>
-            <body>{children}</body>
+            <body>
+                {/* Skip link for keyboard navigation - Requirements 11.2 */}
+                <a href="#main-content" className="skip-link">
+                    Skip to main content
+                </a>
+                {children}
+            </body>
         </html>
     );
 }

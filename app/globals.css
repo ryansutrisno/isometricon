@@ -57,10 +57,43 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Focus States - Accessibility */
+/* Focus States - Accessibility - Requirements 11.1 */
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* Skip Link - Accessibility - Requirements 11.2 */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-primary);
+  color: white;
+  padding: 8px 16px;
+  z-index: 100;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Touch Interactions - Requirements 10.5 */
+button,
+a,
+[role='button'],
+[role='radio'],
+input,
+textarea,
+select {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(99, 102, 241, 0.2);
+}
+
+/* Scroll margin for anchor links - Accessibility */
+[id] {
+  scroll-margin-top: 2rem;
 }
 
 /* Reduced Motion Support - Requirements 11.6 */
@@ -72,4 +105,17 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

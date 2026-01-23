@@ -170,25 +170,25 @@ Implementasi AI Isometric Icon Generator menggunakan Next.js 16 dengan App Route
     - Sitemap generation
     - _Requirements: 1.4, 1.5_
 
-- [ ] 12. Implementasi Accessibility dan Polish
-  - [ ] 12.1 Accessibility audit dan fixes
+- [x] 12. Implementasi Accessibility dan Polish
+  - [x] 12.1 Accessibility audit dan fixes
     - Verify heading hierarchy (h1-h6)
     - Verify semua interactive elements punya focus states
     - Verify keyboard navigation
     - Verify aria-live regions untuk async updates
     - _Requirements: 11.1, 11.2, 11.4, 11.5, 11.7_
-  - [ ] 12.2 Responsive design verification
+  - [x] 12.2 Responsive design verification
     - Test mobile layout (<640px)
     - Test tablet layout (640-1024px)
     - Test desktop layout (>1024px)
     - Verify touch interactions
     - _Requirements: 10.1, 10.2, 10.3, 10.5_
-  - [ ] 12.3 Dark mode dan theming
+  - [x] 12.3 Dark mode dan theming
     - Verify color-scheme: dark
     - Verify theme-color meta tag
     - _Requirements: 12.1, 12.2, 12.3_
 
-- [ ] 13. Final Checkpoint
+- [x] 13. Final Checkpoint
   - Ensure all tests pass, ask the user if questions arise.
   - Verify all requirements are implemented
   - Run accessibility audit

@@ -59,9 +59,9 @@ export default function LandingPage() {
         };
 
     return (
-        <main className="min-h-screen">
+        <main id="main-content" className="min-h-screen">
             {/* Hero Section */}
-            <section className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8">
+            <section className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8" aria-labelledby="hero-heading">
                 {/* Background gradient */}
                 <div
                     className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/10 via-transparent to-transparent"
@@ -70,7 +70,7 @@ export default function LandingPage() {
 
                 <div className="mx-auto max-w-4xl text-center">
                     <motion.div {...fadeInUp}>
-                        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+                        <h1 id="hero-heading" className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
                             <span className="text-text">AI Isometric</span>{' '}
                             <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                                 Icon Generator

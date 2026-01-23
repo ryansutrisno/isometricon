@@ -2,7 +2,7 @@
 
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ErrorDisplay } from '@/components/ErrorDisplay';
 import { GenerateButton } from '@/components/GenerateButton';
@@ -23,6 +23,8 @@ import type { HistoryItem } from '@/types';
 export default function GeneratorPage() {
     const history = useHistory();
     const [selectedHistoryItem, setSelectedHistoryItem] = useState<HistoryItem | null>(null);
+    const modalRef = useRef<HTMLDivElement>(null);
+    const previousFocusRef = useRef<HTMLElement | null>(null);
 
     const generator = useGenerator({
         onSuccess: (imageData) => {
@@ -48,6 +50,7 @@ export default function GeneratorPage() {
     }, [generator]);
 
     const handleSelectHistoryItem = useCallback((item: HistoryItem) => {
+        previousFocusRef.current = document.activeElement as HTMLElement;
         setSelectedHistoryItem(item);
     }, []);
 
@@ -67,14 +70,50 @@ export default function GeneratorPage() {
 
     const handleCloseModal = useCallback(() => {
         setSelectedHistoryItem(null);
+        // Return focus to the element that opened the modal
+        previousFocusRef.current?.focus();
     }, []);
+
+    // Focus trap for modal - Requirements 11.2
+    useEffect(() => {
+        if (!selectedHistoryItem || !modalRef.current) return;
+
+        const modal = modalRef.current;
+        const focusableElements = modal.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        // Focus first element when modal opens
+        firstElement?.focus();
+
+        const handleTabKey = (e: KeyboardEvent) => {
+            if (e.key !== 'Tab') return;
+
+            if (e.shiftKey) {
+                if (document.activeElement === firstElement) {
+                    e.preventDefault();
+                    lastElement?.focus();
+                }
+            } else {
+                if (document.activeElement === lastElement) {
+                    e.preventDefault();
+                    firstElement?.focus();
+                }
+            }
+        };
+
+        modal.addEventListener('keydown', handleTabKey);
+        return () => modal.removeEventListener('keydown', handleTabKey);
+    }, [selectedHistoryItem]);
 
     // Determine what image to show
     const displayImage = generator.state.generatedImage;
     const displayAlt = generator.state.prompt || 'Generated isometric icon';
 
     return (
-        <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+        <main id="main-content" className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
                 {/* Header */}
                 <header className="mb-8">
@@ -92,6 +131,16 @@ export default function GeneratorPage() {
                         Describe your icon and choose a style to generate
                     </p>
                 </header>
+
+                {/* Live region for async updates - Requirements 11.7 */}
+                <div
+                    aria-live="polite"
+                    aria-atomic="true"
+                    className="sr-only"
+                >
+                    {generator.state.isGenerating && 'Generating your icon, please wait…'}
+                    {generator.state.generatedImage && !generator.state.isGenerating && 'Icon generated successfully!'}
+                </div>
 
                 {/* Main content - responsive grid */}
                 <div className="grid gap-8 lg:grid-cols-2">
@@ -155,21 +204,22 @@ export default function GeneratorPage() {
                 </section>
             </div>
 
-            {/* History item modal */}
+            {/* History item modal - Requirements 11.2 */}
             {selectedHistoryItem && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 overscroll-contain"
                     onClick={handleCloseModal}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Escape') handleCloseModal();
-                    }}
                     role="dialog"
                     aria-modal="true"
                     aria-labelledby="modal-title"
                 >
                     <div
+                        ref={modalRef}
                         className="relative max-w-2xl w-full bg-base-light rounded-xl p-4 sm:p-6"
                         onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Escape') handleCloseModal();
+                        }}
                     >
                         <button
                             type="button"
@@ -193,7 +243,7 @@ export default function GeneratorPage() {
                             </svg>
                         </button>
 
-                        <h3 id="modal-title" className="text-lg font-semibold text-text mb-4">
+                        <h3 id="modal-title" className="text-lg font-semibold text-text mb-4 pr-10 break-words">
                             {selectedHistoryItem.prompt}
                         </h3>
 
