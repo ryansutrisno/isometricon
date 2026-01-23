@@ -7,6 +7,7 @@
 import {getHuggingFaceApiKey} from '@/lib/env';
 import {isValidPrompt, sanitizeInput} from '@/lib/input-utils';
 import {buildPrompt} from '@/lib/prompt-builder';
+import {canMakeRequest, recordRequest} from '@/lib/server-rate-limiter';
 import {
   GenerateRequest,
   GenerateResponse,
@@ -16,8 +17,8 @@ import {
 import {NextRequest, NextResponse} from 'next/server';
 
 const HUGGINGFACE_API_URL =
-  'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0';
-const API_TIMEOUT_MS = 10000; // 10 seconds timeout
+  'https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell';
+const API_TIMEOUT_MS = 30000; // 30 seconds timeout (FLUX needs more time)
 
 /**
  * Validates that the style is a valid StylePreset
@@ -89,6 +90,27 @@ export async function POST(
   request: NextRequest,
 ): Promise<NextResponse<GenerateResponse>> {
   try {
+    // Get client IP for rate limiting
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const realIp = request.headers.get('x-real-ip');
+    const ip = forwardedFor?.split(',')[0]?.trim() || realIp || 'unknown';
+
+    // Check server-side rate limit
+    const rateLimitCheck = canMakeRequest(ip);
+    if (!rateLimitCheck.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'RATE_LIMIT',
+            message: rateLimitCheck.reason || 'Rate limit exceeded.',
+            retryAfter: rateLimitCheck.resetInSeconds,
+          },
+        },
+        {status: 429},
+      );
+    }
+
     // Parse request body
     let body: unknown;
     try {
@@ -223,6 +245,8 @@ export async function POST(
 
     // Handle API errors (Requirements: 7.1, 7.2, 7.3, 7.4)
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Hugging Face API error:', response.status, errorText);
       const errorResponse = mapErrorResponse(response.status);
       return NextResponse.json(
         {
@@ -238,6 +262,9 @@ export async function POST(
     const arrayBuffer = await imageBlob.arrayBuffer();
     const base64Image = Buffer.from(arrayBuffer).toString('base64');
     const imageDataUrl = `data:image/png;base64,${base64Image}`;
+
+    // Record successful request for rate limiting
+    recordRequest(ip);
 
     return NextResponse.json({
       success: true,

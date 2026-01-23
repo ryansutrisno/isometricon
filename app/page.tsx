@@ -4,14 +4,14 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { Download, Palette, Sparkles, Zap } from 'lucide-react';
 import Link from 'next/link';
 
-// Example icons data - static placeholder images
+// Example icons data - images from public/examples folder
 const exampleIcons = [
-    { id: 1, name: 'Rocket', gradient: 'from-primary to-secondary' },
-    { id: 2, name: 'Cloud', gradient: 'from-warm-primary to-warm-secondary' },
-    { id: 3, name: 'Cube', gradient: 'from-mono-primary to-mono-secondary' },
-    { id: 4, name: 'Star', gradient: 'from-pastel-primary to-pastel-secondary' },
-    { id: 5, name: 'Heart', gradient: 'from-secondary to-primary' },
-    { id: 6, name: 'Lightning', gradient: 'from-warning to-warm-primary' },
+    { id: 1, name: 'Prism', src: '/examples/buat-icon-pisang.png' },
+    { id: 2, name: 'Baby', src: '/examples/create-a-cute-baby.png' },
+    { id: 3, name: 'Air Plane', src: '/examples/create-a-cute-airplane.png' },
+    { id: 4, name: 'Panda', src: '/examples/create-a-cute-panda.png' },
+    { id: 5, name: 'Banana', src: '/examples/create-icon-banana.png' },
+    { id: 6, name: 'Donut', src: '/examples/create-a-cute-donut.png' },
 ];
 
 const features = [
@@ -64,7 +64,7 @@ export default function LandingPage() {
             <section className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8" aria-labelledby="hero-heading">
                 {/* Background gradient */}
                 <div
-                    className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/10 via-transparent to-transparent"
+                    className="absolute inset-0 -z-10 bg-linear-to-b from-primary/10 via-transparent to-transparent"
                     aria-hidden="true"
                 />
 
@@ -72,7 +72,7 @@ export default function LandingPage() {
                     <motion.div {...fadeInUp}>
                         <h1 id="hero-heading" className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
                             <span className="text-text">AI Isometric</span>{' '}
-                            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                            <span className="bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
                                 Icon Generator
                             </span>
                         </h1>
@@ -83,8 +83,7 @@ export default function LandingPage() {
                         {...fadeInUp}
                         transition={{ delay: 0.1, duration: 0.5 }}
                     >
-                        Create stunning isometric 3D icons from text prompts using AI.
-                        Perfect for designers, developers, and content creators.
+                        Create stunning isometric 3D icons from text prompts using AI. Perfect for designers, developers, and content creators.
                     </motion.p>
 
                     <motion.div
@@ -125,7 +124,7 @@ export default function LandingPage() {
                         {exampleIcons.map((icon, index) => (
                             <motion.div
                                 key={icon.id}
-                                className="group relative aspect-square overflow-hidden rounded-xl bg-base-light p-4 transition-colors hover:bg-base-lighter"
+                                className="group relative aspect-square overflow-hidden rounded-xl bg-base-light p-2 transition-colors hover:bg-base-lighter"
                                 {...(shouldReduceMotion
                                     ? {}
                                     : {
@@ -134,15 +133,16 @@ export default function LandingPage() {
                                         transition: { delay: index * 0.1, duration: 0.3 },
                                     })}
                             >
-                                {/* Placeholder isometric icon */}
-                                <div
-                                    className={`h-full w-full rounded-lg bg-gradient-to-br ${icon.gradient} flex items-center justify-center`}
-                                    style={{ transform: 'rotate(-30deg) skewX(-30deg) scaleY(0.864)' }}
-                                    aria-hidden="true"
-                                >
-                                    <div className="h-1/2 w-1/2 rounded bg-white/20" />
-                                </div>
-                                <span className="sr-only">{icon.name} icon example</span>
+                                {/* Example icon image */}
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    src={icon.src}
+                                    alt={`${icon.name} isometric icon example`}
+                                    width={128}
+                                    height={128}
+                                    className="h-full w-full object-contain"
+                                    loading="lazy"
+                                />
                             </motion.div>
                         ))}
                     </motion.div>
@@ -195,7 +195,7 @@ export default function LandingPage() {
             {/* CTA Section */}
             <section className="px-4 py-20 sm:px-6 lg:px-8">
                 <motion.div
-                    className="mx-auto max-w-4xl rounded-2xl bg-gradient-to-r from-primary/20 to-secondary/20 p-8 text-center sm:p-12"
+                    className="mx-auto max-w-4xl rounded-2xl bg-linear-to-r from-primary/20 to-secondary/20 p-8 text-center sm:p-12"
                     {...(shouldReduceMotion
                         ? {}
                         : {
@@ -224,7 +224,7 @@ export default function LandingPage() {
             {/* Footer */}
             <footer className="border-t border-base-lighter px-4 py-8 sm:px-6 lg:px-8">
                 <div className="mx-auto max-w-6xl text-center text-sm text-text-dim">
-                    <p>© {new Date().getFullYear()} AI Isometric Icon Generator. All rights reserved.</p>
+                    <p>© 2025 AI Isometric Icon Generator. All rights reserved.</p>
                 </div>
             </footer>
         </main>

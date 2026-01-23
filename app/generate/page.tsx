@@ -130,6 +130,27 @@ export default function GeneratorPage() {
                     <p className="mt-2 text-text-muted">
                         Describe your icon and choose a style to generate
                     </p>
+                    {/* Rate limit info */}
+                    <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                        <svg
+                            className="h-4 w-4 text-amber-400"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            aria-hidden="true"
+                        >
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <span className="text-xs text-amber-300">
+                            Demo mode: 5 generations per day per user
+                        </span>
+                    </div>
                 </header>
 
                 {/* Live region for async updates - Requirements 11.7 */}

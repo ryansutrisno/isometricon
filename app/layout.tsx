@@ -92,7 +92,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <head>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -101,7 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
                 />
             </head>
-            <body>
+            <body suppressHydrationWarning>
                 {/* Skip link for keyboard navigation - Requirements 11.2 */}
                 <a href="#main-content" className="skip-link">
                     Skip to main content

@@ -7,8 +7,8 @@
 import type {StoredRateLimit} from '@/types';
 
 const STORAGE_KEY = 'isometric-generator-rate-limit';
-const MAX_REQUESTS = 10;
-const WINDOW_MS = 60 * 1000; // 60 seconds
+const MAX_REQUESTS = 5; // Match server-side limit
+const WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours (match server)
 
 export interface RateLimiter {
   canMakeRequest(): boolean;
