@@ -8,7 +8,7 @@
  * STYLE_CONFIGS, ensuring consistent style application.
  */
 
-import {buildPrompt} from '@/app/api/generate/route';
+import {buildPrompt} from '@/lib/prompt-builder';
 import {STYLE_CONFIGS, StylePreset} from '@/types';
 import fc from 'fast-check';
 import {describe, expect, it} from 'vitest';

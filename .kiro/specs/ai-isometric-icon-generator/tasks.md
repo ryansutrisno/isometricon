@@ -152,18 +152,18 @@ Implementasi AI Isometric Icon Generator menggunakan Next.js 16 dengan App Route
 - [x] 10. Checkpoint - UI Components
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 11. Implementasi Pages
-  - [ ] 11.1 Implementasi Landing Page (/)
+- [x] 11. Implementasi Pages
+  - [x] 11.1 Implementasi Landing Page (/)
     - Hero section dengan value proposition
     - Example icons gallery (static images)
     - CTA button ke /generate
     - Framer Motion animations dengan prefers-reduced-motion support
     - _Requirements: 1.1, 1.2, 1.3, 11.6_
-  - [ ] 11.2 Implementasi Generator Page (/generate)
+  - [x] 11.2 Implementasi Generator Page (/generate)
     - Wire semua components: PromptInput, StyleSelector, GenerateButton, ImageDisplay, ErrorDisplay, HistoryPanel
     - Responsive layout untuk mobile/tablet/desktop
     - _Requirements: 2.1, 10.1, 10.2, 10.3_
-  - [ ] 11.3 Implementasi SEO dan Metadata
+  - [x] 11.3 Implementasi SEO dan Metadata
     - generateMetadata() untuk setiap page
     - OpenGraph tags
     - JSON-LD structured data

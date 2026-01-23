@@ -6,11 +6,11 @@
 
 import {getHuggingFaceApiKey} from '@/lib/env';
 import {isValidPrompt, sanitizeInput} from '@/lib/input-utils';
+import {buildPrompt} from '@/lib/prompt-builder';
 import {
   GenerateRequest,
   GenerateResponse,
   GenerationError,
-  STYLE_CONFIGS,
   StylePreset,
 } from '@/types';
 import {NextRequest, NextResponse} from 'next/server';
@@ -27,16 +27,6 @@ function isValidStyle(style: unknown): style is StylePreset {
     typeof style === 'string' &&
     ['default', 'warm', 'monochrome', 'pastel'].includes(style)
   );
-}
-
-/**
- * Builds the full prompt by combining user prompt with style suffix
- * Requirements: 3.4
- */
-export function buildPrompt(userPrompt: string, style: StylePreset): string {
-  const styleConfig = STYLE_CONFIGS[style];
-  const basePrompt = `isometric 3D icon of ${userPrompt}`;
-  return `${basePrompt}, ${styleConfig.promptSuffix}, clean background, minimalist design, high quality`;
 }
 
 /**

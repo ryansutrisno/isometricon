@@ -8,8 +8,8 @@
  * reaches the external service.
  */
 
-import {buildPrompt} from '@/app/api/generate/route';
 import {isValidPrompt, sanitizeInput} from '@/lib/input-utils';
+import {buildPrompt} from '@/lib/prompt-builder';
 import {StylePreset} from '@/types';
 import fc from 'fast-check';
 import {describe, expect, it} from 'vitest';
