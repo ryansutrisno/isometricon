@@ -8,6 +8,7 @@ import {getHuggingFaceApiKey} from '@/lib/env';
 import {isValidPrompt, sanitizeInput} from '@/lib/input-utils';
 import {buildPrompt} from '@/lib/prompt-builder';
 import {canMakeRequest, recordRequest} from '@/lib/server-rate-limiter';
+import {formatTime} from '@/lib/time-utils';
 import {
   GenerateRequest,
   GenerateResponse,
@@ -38,7 +39,7 @@ function mapErrorResponse(status: number, message?: string): GenerationError {
     case 429:
       return {
         code: 'RATE_LIMIT',
-        message: 'Too many requests. Please try again in a few seconds.',
+        message: 'Too many requests. Please try again later.',
         retryAfter: 60,
       };
     case 503:
@@ -98,12 +99,17 @@ export async function POST(
     // Check server-side rate limit
     const rateLimitCheck = canMakeRequest(ip);
     if (!rateLimitCheck.allowed) {
+      const timeStr = rateLimitCheck.resetInSeconds
+        ? formatTime(rateLimitCheck.resetInSeconds)
+        : 'later';
       return NextResponse.json(
         {
           success: false,
           error: {
             code: 'RATE_LIMIT',
-            message: rateLimitCheck.reason || 'Rate limit exceeded.',
+            message:
+              rateLimitCheck.reason ||
+              `Rate limit exceeded. Please try again in ${timeStr}.`,
             retryAfter: rateLimitCheck.resetInSeconds,
           },
         },

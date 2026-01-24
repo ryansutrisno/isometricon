@@ -4,6 +4,8 @@
  * For hackathon/demo purposes
  */
 
+import {formatTime} from '@/lib/time-utils';
+
 interface RateLimitEntry {
   count: number;
   resetTime: number;
@@ -43,7 +45,7 @@ export function canMakeRequest(ip: string): {
     const resetIn = Math.ceil((totalResetTime - now) / 1000);
     return {
       allowed: false,
-      reason: 'Daily limit reached. Please try again tomorrow.',
+      reason: `Daily limit reached. Please try again in ${formatTime(resetIn)}.`,
       resetInSeconds: resetIn,
     };
   }
@@ -68,7 +70,7 @@ export function canMakeRequest(ip: string): {
     const resetIn = Math.ceil((entry.resetTime - now) / 1000);
     return {
       allowed: false,
-      reason: `You have reached your daily limit of ${MAX_REQUESTS_PER_IP} generations. Please try again tomorrow.`,
+      reason: `You have reached your daily limit of ${MAX_REQUESTS_PER_IP} generations. Please try again in ${formatTime(resetIn)}.`,
       remainingRequests: 0,
       resetInSeconds: resetIn,
     };

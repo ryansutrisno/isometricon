@@ -1,5 +1,6 @@
 'use client';
 
+import { formatTime } from '@/lib/time-utils';
 import type { GenerationError } from '@/types';
 import { useEffect, useState } from 'react';
 
@@ -130,9 +131,8 @@ export function ErrorDisplay({ error, onRetry }: ErrorDisplayProps) {
                         <p className="mt-1 text-sm text-slate-400">
                             Try again in{' '}
                             <span className="font-medium tabular-nums text-slate-300">
-                                {countdown}
-                            </span>{' '}
-                            {countdown === 1 ? 'second' : 'seconds'}
+                                {formatTime(countdown)}
+                            </span>
                         </p>
                     )}
                 </div>
@@ -169,7 +169,7 @@ export function ErrorDisplay({ error, onRetry }: ErrorDisplayProps) {
                     <path d="M3 22v-6h6" />
                     <path d="M21 12a9 9 0 01-15 6.7L3 16" />
                 </svg>
-                <span>{isRateLimited ? `Wait ${countdown}s` : 'Try Again'}</span>
+                <span>{isRateLimited ? `Wait ${formatTime(countdown)}` : 'Try Again'}</span>
             </button>
         </div>
     );

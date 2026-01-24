@@ -11,6 +11,7 @@ import {useCallback, useRef, useState} from 'react';
 import {generateFilename} from '@/lib/filename-generator';
 import {isValidPrompt, sanitizeInput} from '@/lib/input-utils';
 import {createRateLimiter} from '@/lib/rate-limiter';
+import {formatTime} from '@/lib/time-utils';
 import type {GenerationError, GeneratorState, StylePreset} from '@/types';
 
 export interface UseGeneratorOptions {
@@ -75,7 +76,7 @@ export function useGenerator(
         const retryAfter = rateLimiter.current.getTimeUntilReset();
         const error: GenerationError = {
           code: 'RATE_LIMIT',
-          message: `Too many requests. Please try again in ${retryAfter} seconds.`,
+          message: `Too many requests. Please try again in ${formatTime(retryAfter)}.`,
           retryAfter,
         };
         setState((prev) => ({...prev, error, isGenerating: false}));

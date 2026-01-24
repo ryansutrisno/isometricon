@@ -5,6 +5,7 @@ import {useCallback, useEffect, useState} from 'react';
 
 const STORAGE_KEY = 'isometric-generator-history';
 const CURRENT_VERSION = 1;
+const MAX_HISTORY_ITEMS = 5; // Match server rate limit per IP
 
 /**
  * History Manager Hook
@@ -107,7 +108,11 @@ export function useHistory(): UseHistoryReturn {
         createdAt: Date.now(),
       };
 
-      setItems((prev) => [newItem, ...prev]);
+      setItems((prev) => {
+        const updated = [newItem, ...prev];
+        // Keep only the most recent items (match rate limit)
+        return updated.slice(0, MAX_HISTORY_ITEMS);
+      });
       return newItem;
     },
     [],

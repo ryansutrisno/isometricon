@@ -6,11 +6,11 @@ import Link from 'next/link';
 
 // Example icons data - images from public/examples folder
 const exampleIcons = [
-    { id: 1, name: 'Prism', src: '/examples/buat-icon-pisang.png' },
-    { id: 2, name: 'Baby', src: '/examples/create-a-cute-baby.png' },
+    { id: 1, name: 'Patrick Star', src: '/examples/create-a-cute-patrick-star-icon.png' },
+    { id: 2, name: 'Banana', src: '/examples/create-icon-banana.png' },
     { id: 3, name: 'Air Plane', src: '/examples/create-a-cute-airplane.png' },
     { id: 4, name: 'Panda', src: '/examples/create-a-cute-panda.png' },
-    { id: 5, name: 'Banana', src: '/examples/create-icon-banana.png' },
+    { id: 5, name: 'Spongebob', src: '/examples/buat-icon-lucu-spongebob.png' },
     { id: 6, name: 'Donut', src: '/examples/create-a-cute-donut.png' },
 ];
 
