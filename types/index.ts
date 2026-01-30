@@ -52,15 +52,27 @@ export type ErrorCode =
   | 'UNAUTHORIZED'
   | 'SERVER_ERROR'
   | 'VALIDATION_ERROR'
-  | 'TIMEOUT';
+  | 'TIMEOUT'
+  | 'DUAL_PROVIDER_FAILURE';
+
+/**
+ * Provider names for image generation
+ * Requirements: 5.1
+ */
+export type ProviderName = 'huggingface' | 'cloudflare';
 
 /**
  * Generation error structure
+ * Requirements: 4.2 - includes error details from both providers for debugging
  */
 export interface GenerationError {
   code: ErrorCode;
   message: string;
   retryAfter?: number;
+  /** Error message from primary provider when both providers fail */
+  primaryError?: string;
+  /** Error message from fallback provider when both providers fail */
+  fallbackError?: string;
 }
 
 /**
@@ -96,11 +108,16 @@ export interface GenerateRequest {
 
 /**
  * API response for image generation
+ * Requirements: 5.1, 5.3 - includes provider metadata while maintaining backward compatibility
  */
 export interface GenerateResponse {
   success: boolean;
   image?: string; // Base64 encoded
   error?: GenerationError;
+  /** Indicates which provider generated the image: "huggingface" or "cloudflare" */
+  provider?: ProviderName;
+  /** Indicates if fallback provider was attempted */
+  fallbackUsed?: boolean;
 }
 
 /**

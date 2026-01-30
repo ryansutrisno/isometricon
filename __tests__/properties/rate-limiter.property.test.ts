@@ -139,7 +139,8 @@ describe('Property 9: Rate Limit Enforcement', () => {
     // Time until reset should be positive
     const timeUntilReset = limiter.getTimeUntilReset();
     expect(timeUntilReset).toBeGreaterThan(0);
-    expect(timeUntilReset).toBeLessThanOrEqual(60); // Max 60 seconds
+    // WINDOW_MS is 24 hours (86400 seconds)
+    expect(timeUntilReset).toBeLessThanOrEqual(WINDOW_MS / 1000);
   });
 
   it('should handle concurrent request patterns', () => {

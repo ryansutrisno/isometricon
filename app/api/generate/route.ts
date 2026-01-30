@@ -1,25 +1,43 @@
 /**
  * API Route: /api/generate
- * Handles image generation requests via Hugging Face Inference API
- * Requirements: 4.1, 4.5, 4.6, 7.1, 7.2, 7.3, 7.4, 13.3, 13.4
+ * Handles image generation requests with automatic fallback
+ * Requirements: 1.3, 4.1, 4.5, 4.6, 5.1, 5.3, 7.1, 7.2, 7.3, 7.4, 13.3, 13.4
  */
 
-import {getHuggingFaceApiKey} from '@/lib/env';
 import {isValidPrompt, sanitizeInput} from '@/lib/input-utils';
-import {buildPrompt} from '@/lib/prompt-builder';
+import {
+  DualProviderError,
+  createProviderManager,
+} from '@/lib/providers/provider-manager';
+import {ProviderError, ProviderName} from '@/lib/providers/types';
 import {canMakeRequest, recordRequest} from '@/lib/server-rate-limiter';
 import {formatTime} from '@/lib/time-utils';
-import {
-  GenerateRequest,
-  GenerateResponse,
-  GenerationError,
-  StylePreset,
-} from '@/types';
+import {GenerateRequest, StylePreset} from '@/types';
 import {NextRequest, NextResponse} from 'next/server';
 
-const HUGGINGFACE_API_URL =
-  'https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell';
-const API_TIMEOUT_MS = 30000; // 30 seconds timeout (FLUX needs more time)
+/**
+ * Extended API response with provider metadata
+ * Requirements: 1.3, 5.1, 5.3
+ */
+export interface ExtendedGenerateResponse {
+  success: boolean;
+  image?: string;
+  provider?: ProviderName;
+  fallbackUsed?: boolean;
+  error?: ExtendedGenerationError;
+}
+
+/**
+ * Extended error with dual provider failure details
+ * Requirements: 4.2
+ */
+export interface ExtendedGenerationError {
+  code: string;
+  message: string;
+  retryAfter?: number;
+  primaryError?: string;
+  fallbackError?: string;
+}
 
 /**
  * Validates that the style is a valid StylePreset
@@ -32,64 +50,59 @@ function isValidStyle(style: unknown): style is StylePreset {
 }
 
 /**
- * Maps HTTP status codes to GenerationError
+ * Maps ProviderError to ExtendedGenerationError
+ * Requirements: 5.3 - Backward compatibility
  */
-function mapErrorResponse(status: number, message?: string): GenerationError {
-  switch (status) {
-    case 429:
-      return {
-        code: 'RATE_LIMIT',
-        message: 'Too many requests. Please try again later.',
-        retryAfter: 60,
-      };
-    case 503:
-      return {
-        code: 'SERVICE_UNAVAILABLE',
-        message: 'Service is currently unavailable. Please try again later.',
-      };
-    case 401:
-      return {
-        code: 'UNAUTHORIZED',
-        message: 'Authentication error occurred. Please refresh the page.',
-      };
-    case 408:
-      return {
-        code: 'TIMEOUT',
-        message: 'Request timed out. Please try again.',
-      };
-    default:
-      return {
-        code: 'SERVER_ERROR',
-        message: message || 'A server error occurred. Please try again.',
-      };
+function mapProviderError(
+  error: ProviderError | DualProviderError,
+): ExtendedGenerationError {
+  if (error.code === 'DUAL_PROVIDER_FAILURE') {
+    const dualError = error as DualProviderError;
+    return {
+      code: dualError.code,
+      message: dualError.message,
+      retryAfter: dualError.retryAfter,
+      primaryError: dualError.primaryError,
+      fallbackError: dualError.fallbackError,
+    };
   }
+
+  const providerError = error as ProviderError;
+  return {
+    code: providerError.code,
+    message: providerError.message,
+    retryAfter: providerError.retryAfter,
+  };
 }
 
 /**
- * Fetch with timeout wrapper
+ * Maps error code to HTTP status
  */
-async function fetchWithTimeout(
-  url: string,
-  options: RequestInit,
-  timeoutMs: number,
-): Promise<Response> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    });
-    return response;
-  } finally {
-    clearTimeout(timeoutId);
+function errorCodeToHttpStatus(code: string): number {
+  switch (code) {
+    case 'RATE_LIMIT':
+      return 429;
+    case 'SERVICE_UNAVAILABLE':
+      return 503;
+    case 'UNAUTHORIZED':
+      return 401;
+    case 'VALIDATION_ERROR':
+      return 400;
+    case 'TIMEOUT':
+      return 408;
+    case 'DUAL_PROVIDER_FAILURE':
+      return 503;
+    case 'PAYMENT_REQUIRED':
+      return 402;
+    case 'SERVER_ERROR':
+    default:
+      return 500;
   }
 }
 
 export async function POST(
   request: NextRequest,
-): Promise<NextResponse<GenerateResponse>> {
+): Promise<NextResponse<ExtendedGenerateResponse>> {
   try {
     // Get client IP for rate limiting
     const forwardedFor = request.headers.get('x-forwarded-for');
@@ -193,89 +206,56 @@ export async function POST(
       );
     }
 
-    // Get API key (Requirements: 13.3)
-    let apiKey: string;
-    try {
-      apiKey = getHuggingFaceApiKey();
-    } catch {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'SERVER_ERROR',
-            message: 'Server configuration error.',
-          },
-        },
-        {status: 500},
-      );
-    }
-
-    // Build full prompt with style
-    const fullPrompt = buildPrompt(sanitizedPrompt, style);
-
-    // Call Hugging Face API (Requirements: 4.1, 4.6)
-    let response: Response;
-    try {
-      response = await fetchWithTimeout(
-        HUGGINGFACE_API_URL,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            inputs: fullPrompt,
-            parameters: {
-              negative_prompt: 'blurry, low quality, distorted, ugly',
-              num_inference_steps: 30,
-              guidance_scale: 7.5,
-            },
-          }),
-        },
-        API_TIMEOUT_MS,
-      );
-    } catch (error) {
-      // Handle timeout
-      if (error instanceof Error && error.name === 'AbortError') {
-        return NextResponse.json(
-          {
-            success: false,
-            error: mapErrorResponse(408),
-          },
-          {status: 408},
-        );
-      }
-      throw error;
-    }
-
-    // Handle API errors (Requirements: 7.1, 7.2, 7.3, 7.4)
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Hugging Face API error:', response.status, errorText);
-      const errorResponse = mapErrorResponse(response.status);
-      return NextResponse.json(
-        {
-          success: false,
-          error: errorResponse,
-        },
-        {status: response.status},
-      );
-    }
-
-    // Convert response to base64
-    const imageBlob = await response.blob();
-    const arrayBuffer = await imageBlob.arrayBuffer();
-    const base64Image = Buffer.from(arrayBuffer).toString('base64');
-    const imageDataUrl = `data:image/png;base64,${base64Image}`;
-
-    // Record successful request for rate limiting
-    recordRequest(ip);
-
-    return NextResponse.json({
-      success: true,
-      image: imageDataUrl,
+    // Use Provider Manager for generation with automatic fallback
+    // Requirements: 1.1, 1.2, 1.3, 3.1
+    const providerManager = createProviderManager();
+    const result = await providerManager.generate(sanitizedPrompt, {
+      style,
+      negativePrompt: 'blurry, low quality, distorted, ugly',
+      timeout: 30000,
     });
+
+    // Handle generation result
+    if (result.success && result.image) {
+      // Record successful request for rate limiting
+      recordRequest(ip);
+
+      // Requirements: 1.3, 5.1, 5.3 - Include provider metadata
+      return NextResponse.json({
+        success: true,
+        image: result.image,
+        provider: result.provider,
+        fallbackUsed: result.fallbackAttempted ?? false,
+      });
+    }
+
+    // Handle generation failure
+    if (result.error) {
+      const mappedError = mapProviderError(result.error);
+      const httpStatus = errorCodeToHttpStatus(mappedError.code);
+
+      return NextResponse.json(
+        {
+          success: false,
+          provider: result.provider,
+          fallbackUsed: result.fallbackAttempted ?? false,
+          error: mappedError,
+        },
+        {status: httpStatus},
+      );
+    }
+
+    // Fallback for unexpected state
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: 'SERVER_ERROR',
+          message: 'An unexpected error occurred.',
+        },
+      },
+      {status: 500},
+    );
   } catch (error) {
     console.error('Generation error:', error);
     return NextResponse.json(
