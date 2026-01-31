@@ -18,7 +18,7 @@ Create stunning isometric 3D icons from text prompts using AI. Perfect for desig
 - **Styling**: Tailwind CSS v4
 - **Animation**: Framer Motion
 - **Icons**: Lucide React
-- **AI**: Hugging Face Inference API
+- **AI**: Hugging Face Inference API (primary) + Cloudflare Workers AI (fallback)
 - **Testing**: Vitest + fast-check (property-based testing)
 
 ## Getting Started
@@ -28,6 +28,7 @@ Create stunning isometric 3D icons from text prompts using AI. Perfect for desig
 - Node.js 18+
 - npm or yarn
 - Hugging Face API key ([Get one here](https://huggingface.co/settings/tokens))
+- Cloudflare Account ID & API Token ([Get one here](https://dash.cloudflare.com/profile/api-tokens)) - for fallback provider
 
 ### Installation
 
@@ -50,10 +51,12 @@ Create stunning isometric 3D icons from text prompts using AI. Perfect for desig
    cp .env.example .env.local
    ```
 
-4. Add your Hugging Face API key to `.env.local`:
+4. Add your API keys to `.env.local`:
 
    ```
-   HUGGINGFACE_API_KEY=your_api_key_here
+   HUGGINGFACE_API_KEY=your_huggingface_api_key_here
+   CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id_here
+   CLOUDFLARE_API_TOKEN=your_cloudflare_api_token_here
    ```
 
 5. Start the development server:
@@ -105,6 +108,15 @@ Create stunning isometric 3D icons from text prompts using AI. Perfect for desig
 ## Rate Limiting
 
 To protect API quota, the app limits requests to 10 per minute per client.
+
+## Provider Fallback System
+
+The app uses a dual-provider architecture for reliability:
+
+1. **Primary**: Hugging Face Inference API
+2. **Fallback**: Cloudflare Workers AI (FLUX.1 schnell model)
+
+When the primary provider fails with recoverable errors (rate limit, timeout, server error), the system automatically falls back to Cloudflare. This ensures higher availability for image generation.
 
 ## License
 
