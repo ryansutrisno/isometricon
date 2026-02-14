@@ -134,7 +134,7 @@ describe('Property 1: Primary Provider Always Attempted First', () => {
             createSuccessResult(image),
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
@@ -172,9 +172,9 @@ describe('Property 1: Primary Provider Always Attempted First', () => {
           };
 
           const fallbackProvider: ImageProvider = {
-            name: 'puter',
+            name: 'cloudflare',
             async generate() {
-              callOrder.push('puter');
+              callOrder.push('cloudflare');
               return createSuccessResult(image);
             },
           };
@@ -189,7 +189,7 @@ describe('Property 1: Primary Provider Always Attempted First', () => {
           // Property: Primary provider should be called before fallback
           expect(callOrder[0]).toBe('huggingface');
           if (callOrder.length > 1) {
-            expect(callOrder[1]).toBe('puter');
+            expect(callOrder[1]).toBe('cloudflare');
           }
         },
       ),
@@ -216,7 +216,7 @@ describe('Property 2: No Fallback on Primary Success', () => {
             createSuccessResult(image),
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
@@ -250,7 +250,7 @@ describe('Property 2: No Fallback on Primary Success', () => {
             createSuccessResult(image),
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult('different-image'),
           );
 
@@ -289,7 +289,7 @@ describe('Property 6: Parameter Preservation on Fallback', () => {
             createFallbackError(errorMsg),
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
@@ -322,7 +322,7 @@ describe('Property 6: Parameter Preservation on Fallback', () => {
             createFallbackError(errorMsg),
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
@@ -363,7 +363,7 @@ describe('Property 6: Parameter Preservation on Fallback', () => {
             createFallbackError(errorMsg),
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
@@ -404,7 +404,7 @@ describe('Property 7: Dual Failure Error Structure', () => {
             'huggingface',
             createFallbackError(primaryMsg),
           );
-          const fallbackProvider = new MockProvider('puter', {
+          const fallbackProvider = new MockProvider('cloudflare', {
             success: false,
             error: {
               code: 'SERVER_ERROR',
@@ -446,7 +446,7 @@ describe('Property 7: Dual Failure Error Structure', () => {
             'huggingface',
             createFallbackError(primaryMsg),
           );
-          const fallbackProvider = new MockProvider('puter', {
+          const fallbackProvider = new MockProvider('cloudflare', {
             success: false,
             error: {
               code: 'TIMEOUT',
@@ -495,7 +495,7 @@ describe('Property 8: Minimum Retry Time on Dual Rate Limit', () => {
             'huggingface',
             createFallbackError('Rate limit', primaryRetry),
           );
-          const fallbackProvider = new MockProvider('puter', {
+          const fallbackProvider = new MockProvider('cloudflare', {
             success: false,
             error: {
               code: 'RATE_LIMIT',
@@ -532,7 +532,7 @@ describe('Property 8: Minimum Retry Time on Dual Rate Limit', () => {
             'huggingface',
             createFallbackError('Rate limit', primaryRetry),
           );
-          const fallbackProvider = new MockProvider('puter', {
+          const fallbackProvider = new MockProvider('cloudflare', {
             success: false,
             error: {
               code: 'SERVER_ERROR',
@@ -572,7 +572,7 @@ describe('Property 8: Minimum Retry Time on Dual Rate Limit', () => {
               shouldFallback: true,
             },
           });
-          const fallbackProvider = new MockProvider('puter', {
+          const fallbackProvider = new MockProvider('cloudflare', {
             success: false,
             error: {
               code: 'RATE_LIMIT',
@@ -609,7 +609,7 @@ describe('Property 8: Minimum Retry Time on Dual Rate Limit', () => {
             shouldFallback: true,
           },
         });
-        const fallbackProvider = new MockProvider('puter', {
+        const fallbackProvider = new MockProvider('cloudflare', {
           success: false,
           error: {
             code: 'SERVER_ERROR',
@@ -651,7 +651,7 @@ describe('No Fallback on Non-Recoverable Primary Errors', () => {
             createNonFallbackError(errorMsg),
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult('image'),
           );
 

@@ -162,7 +162,7 @@ describe('Property 3: Provider Metadata Always Present', () => {
   /**
    * Validates: Requirements 1.3, 5.1
    * For any successful generation result, the response should always include
-   * a provider field with value "huggingface" or "puter".
+   * a provider field with value "huggingface" or "cloudflare".
    */
   it('should include provider field on primary success', async () => {
     await fc.assert(
@@ -176,7 +176,7 @@ describe('Property 3: Provider Metadata Always Present', () => {
             createSuccessResult(image),
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
@@ -190,7 +190,7 @@ describe('Property 3: Provider Metadata Always Present', () => {
 
           // Property: Provider field should be present and valid
           expect(apiResponse.provider).toBeDefined();
-          expect(['huggingface', 'puter']).toContain(apiResponse.provider);
+          expect(['huggingface', 'cloudflare']).toContain(apiResponse.provider);
           expect(apiResponse.provider).toBe('huggingface');
         },
       ),
@@ -211,7 +211,7 @@ describe('Property 3: Provider Metadata Always Present', () => {
             createFallbackError(errorMsg),
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
@@ -223,17 +223,17 @@ describe('Property 3: Provider Metadata Always Present', () => {
           const result = await manager.generate(prompt, options);
           const apiResponse = transformToApiResponse(result);
 
-          // Property: Provider field should be present and indicate puter
+          // Property: Provider field should be present and indicate cloudflare
           expect(apiResponse.provider).toBeDefined();
-          expect(['huggingface', 'puter']).toContain(apiResponse.provider);
-          expect(apiResponse.provider).toBe('puter');
+          expect(['huggingface', 'cloudflare']).toContain(apiResponse.provider);
+          expect(apiResponse.provider).toBe('cloudflare');
         },
       ),
       {numRuns: 100},
     );
   });
 
-  it('should have provider as huggingface or puter only', async () => {
+  it('should have provider as huggingface or cloudflare only', async () => {
     await fc.assert(
       fc.asyncProperty(
         promptArb,
@@ -250,7 +250,7 @@ describe('Property 3: Provider Metadata Always Present', () => {
             primaryResult,
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
@@ -264,7 +264,7 @@ describe('Property 3: Provider Metadata Always Present', () => {
 
           // Property: Provider should only be one of the valid values
           if (apiResponse.success) {
-            expect(apiResponse.provider).toMatch(/^(huggingface|puter)$/);
+            expect(apiResponse.provider).toMatch(/^(huggingface|cloudflare)$/);
           }
         },
       ),
@@ -296,7 +296,7 @@ describe('Property 9: Backward Compatibility', () => {
             primaryResult,
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
@@ -329,7 +329,7 @@ describe('Property 9: Backward Compatibility', () => {
             createSuccessResult(image),
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
@@ -363,7 +363,7 @@ describe('Property 9: Backward Compatibility', () => {
             'huggingface',
             createFallbackError(primaryMsg),
           );
-          const fallbackProvider = new MockProvider('puter', {
+          const fallbackProvider = new MockProvider('cloudflare', {
             success: false,
             error: {
               code: 'SERVER_ERROR',
@@ -410,7 +410,7 @@ describe('Property 9: Backward Compatibility', () => {
             },
           });
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult('image'),
           );
 
@@ -444,7 +444,7 @@ describe('Property 9: Backward Compatibility', () => {
             createSuccessResult(image),
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
@@ -493,7 +493,7 @@ describe('Property 9: Backward Compatibility', () => {
             primaryResult,
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
@@ -537,7 +537,7 @@ describe('API Response Structure Consistency', () => {
             'huggingface',
             createFallbackError(primaryMsg),
           );
-          const fallbackProvider = new MockProvider('puter', {
+          const fallbackProvider = new MockProvider('cloudflare', {
             success: false,
             error: {
               code: 'SERVER_ERROR',
@@ -575,7 +575,7 @@ describe('API Response Structure Consistency', () => {
             createSuccessResult(image),
           );
           const fallbackProvider = new MockProvider(
-            'puter',
+            'cloudflare',
             createSuccessResult(image),
           );
 
