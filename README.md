@@ -1,5 +1,10 @@
 # AI Isometric Icon Generator
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
+
 Create stunning isometric 3D icons from text prompts using AI. Perfect for designers, developers, and content creators who need quick, consistent isometric graphics without manual design work.
 
 ## Features
@@ -35,8 +40,8 @@ Create stunning isometric 3D icons from text prompts using AI. Perfect for desig
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/ai-isometric-icon-generator.git
-   cd ai-isometric-icon-generator
+   git clone https://github.com/ryansutrisno/isometricon.git
+   cd isometricon
    ```
 
 2. Install dependencies:
@@ -118,6 +123,18 @@ The app uses a dual-provider architecture for reliability:
 
 When the primary provider fails with recoverable errors (rate limit, timeout, server error), the system automatically falls back to Cloudflare. This ensures higher availability for image generation.
 
+## Credits
+
+Created and maintained by [Ryan Sutrisno](https://github.com/ryansutrisno).
+
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Code of Conduct
+
+This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+
 ## License
 
-MIT
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
