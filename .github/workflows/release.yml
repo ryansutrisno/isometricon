@@ -1,0 +1,292 @@
+name: Release
+
+on:
+  # Auto trigger dari push ke main
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+  # Manual trigger via GitHub UI
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type (untuk manual release)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      release_notes:
+        description: 'Custom release notes (optional)'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  analyze:
+    name: Analyze Commits
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.analysis.outputs.should_release }}
+      version_type: ${{ steps.analysis.outputs.version_type }}
+      next_version: ${{ steps.analysis.outputs.next_version }}
+      release_notes: ${{ steps.analysis.outputs.release_notes }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get current version from latest tag
+        id: current_version
+        run: |
+          # Get latest tag, default to v0.0.0 if none exists
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          CURRENT_VERSION=${LATEST_TAG#v}
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Latest tag: $LATEST_TAG"
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Analyze commits (auto mode)
+        if: github.event_name == 'push'
+        id: analysis
+        run: |
+          CURRENT_VERSION="${{ steps.current_version.outputs.current_version }}"
+          
+          # Get commits since last tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -n "$LATEST_TAG" ]; then
+            COMMITS=$(git log $LATEST_TAG..HEAD --pretty=format:"%s" --no-merges)
+          else
+            COMMITS=$(git log --pretty=format:"%s" --no-merges -20)
+          fi
+          
+          echo "Analyzing commits:"
+          echo "$COMMITS"
+          echo "---"
+          
+          # Determine version bump type
+          BUMP_TYPE=""
+          RELEASE_NOTES=""
+          
+          # Check for breaking changes
+          if echo "$COMMITS" | grep -qE "^[a-z]+(\(.+\))?!:|BREAKING CHANGE:" || \
+             echo "$COMMITS" | grep -qE "BREAKING CHANGE"; then
+            BUMP_TYPE="major"
+            RELEASE_NOTES="## 🚨 Breaking Changes\n"
+            BREAKING_COMMITS=$(echo "$COMMITS" | grep -E "^[a-z]+(\(.+\))?!:|BREAKING CHANGE:" | sed 's/^/- /')
+            RELEASE_NOTES="${RELEASE_NOTES}${BREAKING_COMMITS}\n\n"
+          fi
+          
+          # Check for features
+          if echo "$COMMITS" | grep -qE "^feat(\(.+\))?:"; then
+            if [ -z "$BUMP_TYPE" ]; then
+              BUMP_TYPE="minor"
+            fi
+            FEAT_COMMITS=$(echo "$COMMITS" | grep "^feat" | sed 's/^/- /')
+            RELEASE_NOTES="${RELEASE_NOTES}## ✨ Features\n${FEAT_COMMITS}\n\n"
+          fi
+          
+          # Check for fixes
+          if echo "$COMMITS" | grep -qE "^fix(\(.+\))?:"; then
+            if [ -z "$BUMP_TYPE" ]; then
+              BUMP_TYPE="patch"
+            fi
+            FIX_COMMITS=$(echo "$COMMITS" | grep "^fix" | sed 's/^/- /')
+            RELEASE_NOTES="${RELEASE_NOTES}## 🐛 Bug Fixes\n${FIX_COMMITS}\n\n"
+          fi
+          
+          # Check for docs
+          if echo "$COMMITS" | grep -qE "^docs(\(.+\))?:"; then
+            DOCS_COMMITS=$(echo "$COMMITS" | grep "^docs" | sed 's/^/- /')
+            RELEASE_NOTES="${RELEASE_NOTES}## 📚 Documentation\n${DOCS_COMMITS}\n\n"
+          fi
+          
+          # Check for other changes
+          OTHER_COMMITS=$(echo "$COMMITS" | grep -vE "^(feat|fix|docs)(\(.+\))?!?:" | grep -vE "BREAKING CHANGE" | sed 's/^/- /')
+          if [ -n "$OTHER_COMMITS" ]; then
+            RELEASE_NOTES="${RELEASE_NOTES}## 🔧 Other Changes\n${OTHER_COMMITS}\n\n"
+          fi
+          
+          # Calculate next version
+          if [ -n "$BUMP_TYPE" ]; then
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+            case $BUMP_TYPE in
+              major)
+                MAJOR=$((MAJOR + 1))
+                MINOR=0
+                PATCH=0
+                ;;
+              minor)
+                MINOR=$((MINOR + 1))
+                PATCH=0
+                ;;
+              patch)
+                PATCH=$((PATCH + 1))
+                ;;
+            esac
+            NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
+            
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "version_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+            echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+            
+            # Format release notes
+            FORMATTED_NOTES="## What's Changed\n\n${RELEASE_NOTES}\n**Full Changelog**: https://github.com/${{ github.repository }}/compare/v${CURRENT_VERSION}...v${NEXT_VERSION}"
+            
+            # Escape newlines for GitHub Actions
+            FORMATTED_NOTES="${FORMATTED_NOTES//'%'/'%25'}"
+            FORMATTED_NOTES="${FORMATTED_NOTES//$'\n'/'%0A'}"
+            FORMATTED_NOTES="${FORMATTED_NOTES//$'\r'/'%0D'}"
+            
+            echo "release_notes=$FORMATTED_NOTES" >> $GITHUB_OUTPUT
+            
+            echo "✅ Will release version $NEXT_VERSION ($BUMP_TYPE)"
+          else
+            echo "should_release=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No significant changes to release"
+          fi
+
+      - name: Use manual version (manual mode)
+        if: github.event_name == 'workflow_dispatch'
+        id: manual_analysis
+        run: |
+          CURRENT_VERSION="${{ steps.current_version.outputs.current_version }}"
+          BUMP_TYPE="${{ github.event.inputs.version_type }}"
+          CUSTOM_NOTES="${{ github.event.inputs.release_notes }}"
+          
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          case $BUMP_TYPE in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+          NEXT_VERSION="$MAJOR.$MINOR.$PATCH"
+          
+          echo "should_release=true" >> $GITHUB_OUTPUT
+          echo "version_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+          echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+          
+          if [ -n "$CUSTOM_NOTES" ]; then
+            FORMATTED_NOTES="## Release Notes\n\n${CUSTOM_NOTES}\n\n**Full Changelog**: https://github.com/${{ github.repository }}/compare/v${CURRENT_VERSION}...v${NEXT_VERSION}"
+          else
+            FORMATTED_NOTES="## Manual Release\n\nVersion bump to v${NEXT_VERSION}\n\n**Full Changelog**: https://github.com/${{ github.repository }}/compare/v${CURRENT_VERSION}...v${NEXT_VERSION}"
+          fi
+          
+          # Escape newlines
+          FORMATTED_NOTES="${FORMATTED_NOTES//'%'/'%25'}"
+          FORMATTED_NOTES="${FORMATTED_NOTES//$'\n'/'%0A'}"
+          FORMATTED_NOTES="${FORMATTED_NOTES//$'\r'/'%0D'}"
+          
+          echo "release_notes=$FORMATTED_NOTES" >> $GITHUB_OUTPUT
+          
+          echo "✅ Manual release: version $NEXT_VERSION ($BUMP_TYPE)"
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: analyze
+    if: needs.analyze.outputs.should_release == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run tests
+        run: npm run test
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [analyze, test]
+    if: needs.analyze.outputs.should_release == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update version in package.json
+        run: |
+          NEW_VERSION="${{ needs.analyze.outputs.next_version }}"
+          npm version $NEW_VERSION --no-git-tag-version --allow-same-version
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Commit version bump
+        run: |
+          git add package.json package-lock.json
+          git commit -m "chore(release): bump version to ${{ needs.analyze.outputs.next_version }} [skip ci]"
+
+      - name: Create tag
+        run: |
+          git tag -a "v${{ needs.analyze.outputs.next_version }}" -m "Release v${{ needs.analyze.outputs.next_version }}"
+
+      - name: Push changes
+        run: |
+          git push origin HEAD:main
+          git push origin "v${{ needs.analyze.outputs.next_version }}"
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ needs.analyze.outputs.next_version }}
+          release_name: Release v${{ needs.analyze.outputs.next_version }}
+          body: ${{ needs.analyze.outputs.release_notes }}
+          draft: false
+          prerelease: false
+
+  skip-release:
+    name: Skip Release
+    runs-on: ubuntu-latest
+    needs: analyze
+    if: needs.analyze.outputs.should_release == 'false' && github.event_name == 'push'
+    steps:
+      - name: Log skip reason
+        run: |
+          echo "ℹ️ No release created - no significant changes detected"
+          echo "Commits must start with: feat:, fix:, or include BREAKING CHANGE: to trigger release"
