@@ -6,10 +6,20 @@ const siteUrl =
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-    },
+    rules: [
+      {
+        userAgent: 'facebookexternalhit',
+        allow: '/',
+      },
+      {
+        userAgent: 'Facebot',
+        allow: '/',
+      },
+      {
+        userAgent: '*',
+        allow: '/',
+      },
+    ],
     sitemap: `${siteUrl}/sitemap.xml`,
   };
 }
