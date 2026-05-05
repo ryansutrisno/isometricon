@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://isometric-icon-generator.vercel.app';
+const ogImage = '/isometric-icon-generator.png';
 
 export const metadata: Metadata = {
     metadataBase: new URL(siteUrl),
@@ -22,6 +23,9 @@ export const metadata: Metadata = {
     ],
     authors: [{ name: 'AI Isometric Icon Generator' }],
     creator: 'AI Isometric Icon Generator',
+    alternates: {
+        canonical: siteUrl,
+    },
     openGraph: {
         type: 'website',
         locale: 'en_US',
@@ -32,7 +36,7 @@ export const metadata: Metadata = {
             'Create stunning isometric 3D icons from text prompts using AI. Perfect for designers, developers, and content creators.',
         images: [
             {
-                url: '/og-image.png',
+                url: ogImage,
                 width: 1200,
                 height: 630,
                 alt: 'AI Isometric Icon Generator - Create stunning 3D icons with AI',
@@ -44,7 +48,7 @@ export const metadata: Metadata = {
         title: 'AI Isometric Icon Generator',
         description:
             'Create stunning isometric 3D icons from text prompts using AI.',
-        images: ['/og-image.png'],
+        images: [ogImage],
     },
     robots: {
         index: true,
