@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://isometric-icon-generator.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://isometricon.trazmedia.com';
 const ogImage = '/isometric-icon-generator.png';
 
 export const metadata: Metadata = {
