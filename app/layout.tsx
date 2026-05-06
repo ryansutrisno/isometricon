@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 const siteUrl = 'https://isometricon.trazmedia.com';
-const ogImage = `${siteUrl}/isometric-icon-generator.png`;
+const ogImage = 'https://isometricon-generator.vercel.app/isometric-icon-generator.png';
 
 export const metadata: Metadata = {
     metadataBase: new URL(siteUrl),
