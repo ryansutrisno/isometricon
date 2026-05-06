@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://isometricon.trazmedia.com';
-const ogImage = '/isometric-icon-generator.png';
+const siteUrl = 'https://isometricon.trazmedia.com';
+const ogImage = `${siteUrl}/isometric-icon-generator.png`;
 
 export const metadata: Metadata = {
     metadataBase: new URL(siteUrl),
@@ -37,6 +37,7 @@ export const metadata: Metadata = {
         images: [
             {
                 url: ogImage,
+                type: 'image/png',
                 width: 1200,
                 height: 630,
                 alt: 'AI Isometric Icon Generator - Create stunning 3D icons with AI',
